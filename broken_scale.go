@@ -84,14 +84,23 @@ func (b BrokenScale) Normalize(min, max, x float64) float64 {
 	return b.HighCutFraction * (x - min) / (b.HighCut - min)
 }
 
+// BrokenTicks creates ticks appropriate for a broken scale.
 type BrokenTicks struct {
+	// HighCut is the location of the break in the scale
 	HighCut float64
+
+	// MaxFormat is the string format for the tick at the maximum value.
+	// All other ticks will be formatted using plot.DefaultTicks.
+	MaxFormat string
 }
 
 func (b BrokenTicks) Ticks(min, max float64) []plot.Tick {
+	if b.MaxFormat == "" {
+		b.MaxFormat = "%0.2g"
+	}
 	ticks := plot.DefaultTicks{}.Ticks(min, b.HighCut)
 	return append(ticks, plot.Tick{
 		Value: max,
-		Label: fmt.Sprintf("%.0f", max),
+		Label: fmt.Sprintf(b.MaxFormat, max),
 	})
 }
